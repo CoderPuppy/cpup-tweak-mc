@@ -9,6 +9,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.init.Items
 import cpup.mc.lib.util.ItemUtil
 
+case class Pickaxe(head: Part, binding: Part, handle: Part) extends Tool {
+	override def parts = List(head, binding, handle)
+}
+
 object Pickaxe {
 	def mod = CPupTweak
 
