@@ -6,30 +6,12 @@ import cpup.mc.tweak.CPupTweak
 object VanillaMaterials {
 	def mod = CPupTweak
 
-	object Iron extends Part.Material with SingletonSerialization.TEntry {
-		def id = s"${mod.ref.modID}:tools.vanilla.iron"
-		def canMake(shape: Part.Shape) = shape match {
-			case Pickaxe.Head => true
-			case _ => false
-		}
-	}
-	SingletonSerialization.register(Iron)
+	object Iron extends Part.Material
+	SingletonSerialization.register(Iron, s"${mod.ref.modID}:tools.vanilla.iron")
 
-	object Leather extends Part.Material with SingletonSerialization.TEntry {
-		def id = s"${mod.ref.modID}:tools.vanilla.leather"
-		def canMake(shape: Part.Shape) = shape match {
-			case GenericParts.Binding => true
-			case _ => false
-		}
-	}
-	SingletonSerialization.register(Leather)
+	object Leather extends Part.Material
+	SingletonSerialization.register(Leather, s"${mod.ref.modID}:tools.vanilla.leather")
 
-	object String extends Part.Material with SingletonSerialization.TEntry {
-		def id = s"${mod.ref.modID}:tools.vanilla.string"
-		def canMake(shape: Part.Shape) = shape match {
-			case GenericParts.Binding => true
-			case _ => false
-		}
-	}
-	SingletonSerialization.register(String)
+	object String extends Part.Material
+	SingletonSerialization.register(String, s"${mod.ref.modID}:tools.vanilla.string")
 }

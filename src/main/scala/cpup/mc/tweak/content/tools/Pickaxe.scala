@@ -4,10 +4,11 @@ import cpup.mc.tweak.content.BaseRecipe
 import net.minecraft.inventory.InventoryCrafting
 import net.minecraft.world.World
 import cpup.mc.tweak.CPupTweak
-import cpup.mc.lib.util.serializing.{SerializationRegistry, SingletonSerialization}
+import cpup.mc.lib.util.serializing.{Serialize, SerializableType, SerializationRegistry, SingletonSerialization}
 import net.minecraft.item.ItemStack
 import net.minecraft.init.Items
 import cpup.mc.lib.util.ItemUtil
+import net.minecraft.nbt.NBTTagCompound
 
 case class Pickaxe(head: Part, binding: Part, handle: Part) extends Tool {
 	override def parts = List(head, binding, handle)
@@ -16,8 +17,27 @@ case class Pickaxe(head: Part, binding: Part, handle: Part) extends Tool {
 object Pickaxe {
 	def mod = CPupTweak
 
-	case object Head extends Part.Shape with SingletonSerialization.TEntry { def id = s"${mod.ref.modID}:tools.pickaxe.head" }
-	SingletonSerialization.register(Head)
+	case object Head extends Part.Shape
+	SingletonSerialization.register(Head, s"${mod.ref.modID}:tools.pickaxe.head")
+
+	object Type extends SerializableType[Pickaxe, NBTTagCompound] {
+		def mod = CPupTweak
+		override def id = s"${mod.ref.modID}:tools.pickaxe"
+		override def cla = classOf[Pickaxe]
+
+		override def nbtClass = classOf[NBTTagCompound]
+		override def writeToNBT(pickaxe: Pickaxe) = {
+			val nbt = new NBTTagCompound
+			nbt.setTag("head", Serialize(pickaxe.head))
+			nbt.setTag("binding", Serialize(pickaxe.binding))
+			nbt.setTag("handle", Serialize(pickaxe.handle))
+			nbt
+		}
+		override def readFromNBT(nbt: NBTTagCompound) = (nbt.getCompoundTag("head"), nbt.getCompoundTag("binding"), nbt.getCompoundTag("handle")) match {
+			case (Serialize(head: Part), Serialize(binding: Part), Serialize(handle: Part)) => Pickaxe(head, binding, handle)
+			case _ => null
+		}
+	}
 
 	object Recipe extends BaseRecipe {
 //		def width = 1

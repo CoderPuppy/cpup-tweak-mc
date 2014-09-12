@@ -3,23 +3,13 @@ package cpup.mc.tweak.content.tools
 import cpup.mc.tweak.content.BaseItem
 import net.minecraft.item.ItemStack
 import net.minecraft.entity.player.EntityPlayer
-import cpup.mc.lib.util.serializing.{SerializableType, Serializable, SerializationRegistry}
+import cpup.mc.lib.util.serializing.{SerializableType, Serialize, SerializationRegistry}
 import cpup.mc.lib.util.{NBTUtil, ItemUtil}
 import scala.collection.mutable
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import cpup.mc.tweak.CPupTweak
 
-case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*) extends Serializable[NBTTagCompound] {
-	override def typ = Part.Type
-
-	override def writeToNBT = {
-		val nbt = new NBTTagCompound
-		nbt.setTag("shape", Serializable(shape))
-		nbt.setTag("material", Serializable(material))
-		nbt.setTag("modifications", NBTUtil.writeList(modifications.map(Serializable(_))))
-		nbt
-	}
-}
+case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*)
 
 object Part {
 	trait Shape
@@ -43,14 +33,21 @@ object Part {
 		_modifications -= ((mod, material, shape))
 	}
 
-	object Type extends SerializableType[NBTTagCompound] {
+	object Type extends SerializableType[Part, NBTTagCompound] {
 		def mod = CPupTweak
 		override def id = s"${mod.ref.modID}:tools.part"
 		override def cla = classOf[Part]
 
 		override def nbtClass = classOf[NBTTagCompound]
+		override def writeToNBT(part: Part) = {
+			val nbt = new NBTTagCompound
+			nbt.setTag("shape", Serialize(part.shape))
+			nbt.setTag("material", Serialize(part.material))
+			nbt.setTag("modifications", Serialize(part.modifications))
+			nbt
+		}
 		override def readFromNBT(nbt: NBTTagCompound) = (nbt.getCompoundTag("shape"), nbt.getCompoundTag("material"), nbt.getCompoundTag("modifications")) match {
-			case (Serializable(shape: Part.Shape), Serializable(material: Part.Material), Serializable(modifications: List[Modification])) =>
+			case (Serialize(shape: Part.Shape), Serialize(material: Part.Material), Serialize(modifications: List[Modification])) =>
 				Part(shape, material, modifications)
 
 			case _ => null
