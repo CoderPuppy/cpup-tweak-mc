@@ -56,6 +56,7 @@ object Part {
 			case _ => null
 		}
 	}
+	SerializationRegistry.registerType(Type)
 
 	object Item extends BaseItem {
 		name = "part"
