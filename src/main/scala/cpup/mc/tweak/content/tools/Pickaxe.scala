@@ -4,7 +4,7 @@ import cpup.mc.tweak.content.BaseRecipe
 import net.minecraft.inventory.InventoryCrafting
 import net.minecraft.world.World
 import cpup.mc.tweak.CPupTweak
-import cpup.mc.lib.util.serializing.{Serialize, SerializableType, SerializationRegistry, SingletonSerialization}
+import cpup.mc.lib.util.serializing.{Serialized, SerializableType, SerializationRegistry, SingletonSerialization}
 import net.minecraft.item.ItemStack
 import net.minecraft.init.Items
 import cpup.mc.lib.util.ItemUtil
@@ -28,13 +28,13 @@ object Pickaxe {
 		override def nbtClass = classOf[NBTTagCompound]
 		override def writeToNBT(pickaxe: Pickaxe) = {
 			val nbt = new NBTTagCompound
-			nbt.setTag("head", Serialize(pickaxe.head))
-			nbt.setTag("binding", Serialize(pickaxe.binding))
-			nbt.setTag("handle", Serialize(pickaxe.handle))
+			nbt.setTag("head", Serialized(pickaxe.head))
+			nbt.setTag("binding", Serialized(pickaxe.binding))
+			nbt.setTag("handle", Serialized(pickaxe.handle))
 			nbt
 		}
 		override def readFromNBT(nbt: NBTTagCompound) = (nbt.getCompoundTag("head"), nbt.getCompoundTag("binding"), nbt.getCompoundTag("handle")) match {
-			case (Serialize(head: Part), Serialize(binding: Part), Serialize(handle: Part)) => Pickaxe(head, binding, handle)
+			case (Serialized(head: Part), Serialized(binding: Part), Serialized(handle: Part)) => Pickaxe(head, binding, handle)
 			case _ => null
 		}
 	}

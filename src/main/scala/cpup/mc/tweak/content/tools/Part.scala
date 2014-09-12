@@ -3,7 +3,7 @@ package cpup.mc.tweak.content.tools
 import cpup.mc.tweak.content.BaseItem
 import net.minecraft.item.ItemStack
 import net.minecraft.entity.player.EntityPlayer
-import cpup.mc.lib.util.serializing.{SerializableType, Serialize, SerializationRegistry}
+import cpup.mc.lib.util.serializing.{SerializableType, Serialized, SerializationRegistry}
 import cpup.mc.lib.util.{NBTUtil, ItemUtil}
 import scala.collection.mutable
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
@@ -41,13 +41,13 @@ object Part {
 		override def nbtClass = classOf[NBTTagCompound]
 		override def writeToNBT(part: Part) = {
 			val nbt = new NBTTagCompound
-			nbt.setTag("shape", Serialize(part.shape))
-			nbt.setTag("material", Serialize(part.material))
-			nbt.setTag("modifications", Serialize(part.modifications))
+			nbt.setTag("shape", Serialized(part.shape))
+			nbt.setTag("material", Serialized(part.material))
+			nbt.setTag("modifications", Serialized(part.modifications))
 			nbt
 		}
 		override def readFromNBT(nbt: NBTTagCompound) = (nbt.getCompoundTag("shape"), nbt.getCompoundTag("material"), nbt.getCompoundTag("modifications")) match {
-			case (Serialize(shape: Part.Shape), Serialize(material: Part.Material), Serialize(modifications: List[Modification])) =>
+			case (Serialized(shape: Part.Shape), Serialized(material: Part.Material), Serialized(modifications: List[Modification])) =>
 				Part(shape, material, modifications)
 
 			case _ => null
