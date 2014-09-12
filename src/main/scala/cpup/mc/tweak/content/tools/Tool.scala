@@ -20,7 +20,7 @@ object Tool {
 
 		override def canHarvestBlock(block: Block, stack: ItemStack) = true
 
-		override def onBlockStartBreak(stack: ItemStack, x:  'Int, y: Int, z: Int, player: EntityPlayer) = {
+		override def onBlockStartBreak(stack: ItemStack, x: Int, y: Int, z: Int, player: EntityPlayer) = {
 			false
 		}
 
