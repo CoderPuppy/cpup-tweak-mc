@@ -8,7 +8,7 @@ object Tools {
 		VanillaMaterials
 		GenericParts
 		Pickaxe
-		Part//.Type
+		Part
 
 		registrar.registerItem(Tool.Item)
 		registrar.registerItem(Part.Item)
