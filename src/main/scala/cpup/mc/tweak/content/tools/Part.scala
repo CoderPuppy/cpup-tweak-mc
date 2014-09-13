@@ -70,9 +70,7 @@ object Part {
 			if(advanced) {
 				lore += ItemUtil.compound(stack).toString
 				lore += (SerializationRegistry.readFromNBT[Part](ItemUtil.compound(stack)) match {
-					case part: Part =>
-						mod.logger.info(part.toString)
-						part.toString
+					case part: Part => part.toString
 					case null => "Not a Part: null"
 				})
 			}
