@@ -1,0 +1,36 @@
+/give ForgeDevName cpup-tweak:part 1 0 {id: "cpup-tweak:tools.part", data: {shape: {id: "cpup-tweak:tools.pickaxe.head", data: 0b}, material: {id: "cpup-tweak:tools.vanilla.iron", data: 0b}, modifications: {id: "cpup-mc:seq", data: []}}}
+/give ForgeDevName cpup-tweak:tool 1 0 {id: "cpup-tweak:tools.pickaxe", data: { head: {id: "cpup-tweak:tools.part", data: { shape: {id: "cpup-tweak:tools.pickaxe.head", data: 0b}, material: {id: "cpup-tweak:tools.vanilla.iron", data: 0b}, modifications: {id: "cpup-mc:seq", data: []} }}, binding: {id: "cpup-tweak:tools.part", data: { shape: {id: "cpup-tweak:tools.generic.binding", data: 0b}, material: {id: "cpup-tweak:tools.vanilla.leather", data: 0b}, modifications: {id: "cpup-mc:seq", data: []} }}, handle: {id: "cpup-tweak:tools.part", data: { shape: {id: "cpup-tweak:tools.generic.handle", data: 0b}, material: {id: "cpup-tweak:tools.vanilla.wood", data: 0b}, modifications: {id: "cpup-mc:seq", data: []} }} }}
+{id: "cpup-tweak:tools.pickaxe", data: {
+	head: {id: "cpup-tweak:tools.part", data: {
+		shape: {id: "cpup-tweak:tools.pickaxe.head", data: 0b},
+		material: {id: "cpup-tweak:tools.vanilla.iron", data: 0b},
+		modifications: {id: "cpup-mc:seq", data: []}
+	}},
+	binding: {id: "cpup-tweak:tools.part", data: {
+		shape: {id: "cpup-tweak:tools.generic.binding", data: 0b},
+		material: {id: "cpup-tweak:tools.vanilla.leather", data: 0b},
+		modifications: {id: "cpup-mc:seq", data: []}
+	}},
+	handle: {id: "cpup-tweak:tools.part", data: {
+		shape: {id: "cpup-tweak:tools.generic.handle", data: 0b},
+		material: {id: "cpup-tweak:tools.vanilla.wood", data: 0b},
+		modifications: {id: "cpup-mc:seq", data: []}
+	}}
+}}
+{id: "cpup-tweak:tools.part", data: {
+	shape: {id: "cpup-tweak:tools.pickaxe.head", data: 0b},
+	material: {id: "cpup-tweak:tools.vanilla.iron", data: 0b},
+	modifications: {id: "cpup-mc:seq", data: []}
+}}
+{id: "cpup-tweak:tools.part", data: {
+	shape: {id: "cpup-tweak:tools.generic.binding", data: 0b},
+	material: {id: "cpup-tweak:tools.vanilla.leather", data: 0b},
+	modifications: {id: "cpup-mc:seq", data: []}
+}}
+{id: "cpup-tweak:tools.part", data: {
+	shape: {id: "cpup-tweak:tools.generic.handle", data: 0b},
+	material: {id: "cpup-tweak:tools.vanilla.wood", data: 0b},
+	modifications: {id: "cpup-mc:seq", data: []}
+}}
+{id: "cpup-tweak:tools.pickaxe.head", data: 0}
+{id: "cpup-tweak:tools.vanilla.iron", data: 0}
