@@ -4,9 +4,9 @@ import cpup.mc.tweak.content.BaseItem
 import net.minecraft.item.ItemStack
 import net.minecraft.entity.player.EntityPlayer
 import cpup.mc.lib.util.serializing.{SerializableType, Serialized, SerializationRegistry}
-import cpup.mc.lib.util.{NBTUtil, ItemUtil}
+import cpup.mc.lib.util.ItemUtil
 import scala.collection.mutable
-import net.minecraft.nbt.{NBTBase, NBTTagCompound}
+import net.minecraft.nbt.NBTTagCompound
 import cpup.mc.tweak.CPupTweak
 
 case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*)
@@ -46,12 +46,19 @@ object Part {
 			nbt.setTag("modifications", Serialized(part.modifications))
 			nbt
 		}
-		override def readFromNBT(nbt: NBTTagCompound) = (nbt.getCompoundTag("shape"), nbt.getCompoundTag("material"), nbt.getCompoundTag("modifications")) match {
-			case (Serialized(shape: Part.Shape), Serialized(material: Part.Material), Serialized(modifications: List[Modification])) =>
-				Part(shape, material, modifications)
+		override def readFromNBT(nbt: NBTTagCompound) = (
+			Serialized.un[Part.Shape](nbt.getCompoundTag("shape")),
+			Serialized.un[Part.Material](nbt.getCompoundTag("material")),
+			Serialized.un[List[Part.Modification]](nbt.getCompoundTag("modifications"))
+		) match {
+			case (shape: Part.Shape, material: Part.Material, modifications: List[Part.Modification]) =>
+				Part(shape, material, modifications: _*)
 
-			case _ => null
+			case r =>
+				mod.logger.info("got {}", r)
+				null
 		}
+
 	}
 	SerializationRegistry.registerType(Type)
 
@@ -61,8 +68,11 @@ object Part {
 		override def addLore(stack: ItemStack, player: EntityPlayer, lore: mutable.Buffer[String], advanced: Boolean) {
 			super.addLore(stack, player, lore, advanced)
 			if(advanced) {
+				lore += ItemUtil.compound(stack).toString
 				lore += (SerializationRegistry.readFromNBT[Part](ItemUtil.compound(stack)) match {
-					case part: Part => part.toString
+					case part: Part =>
+						mod.logger.info(part.toString)
+						part.toString
 					case null => "Not a Part: null"
 				})
 			}

@@ -33,11 +33,18 @@ object Pickaxe {
 			nbt.setTag("handle", Serialized(pickaxe.handle))
 			nbt
 		}
-		override def readFromNBT(nbt: NBTTagCompound) = (nbt.getCompoundTag("head"), nbt.getCompoundTag("binding"), nbt.getCompoundTag("handle")) match {
-			case (Serialized(head: Part), Serialized(binding: Part), Serialized(handle: Part)) => Pickaxe(head, binding, handle)
-			case _ => null
+		override def readFromNBT(nbt: NBTTagCompound) = (
+			Serialized.un[Part](nbt.getCompoundTag("head")),
+			Serialized.un[Part](nbt.getCompoundTag("binding")),
+			Serialized.un[Part](nbt.getCompoundTag("handle"))
+		) match {
+			case (head: Part, binding: Part, handle: Part) => Pickaxe(head, binding, handle)
+			case r =>
+				mod.logger.warn("got {} when parsing a pickaxe", r)
+				null
 		}
 	}
+	SerializationRegistry.registerType(Type)
 
 	object Recipe extends BaseRecipe {
 //		def width = 1

@@ -8,7 +8,7 @@ object Tools {
 		VanillaMaterials
 		GenericParts
 		Pickaxe
-		Part
+		Part//.Type
 
 		registrar.registerItem(Tool.Item)
 		registrar.registerItem(Part.Item)
@@ -18,5 +18,6 @@ object Tools {
 		Part.register(VanillaMaterials.Leather, GenericParts.Binding, null)
 		Part.register(VanillaMaterials.String, GenericParts.Binding, null)
 		Part.register(VanillaMaterials.Iron, Pickaxe.Head, null)
+		Part.register(VanillaMaterials.Wood, GenericParts.Handle, null)
 	}
 }

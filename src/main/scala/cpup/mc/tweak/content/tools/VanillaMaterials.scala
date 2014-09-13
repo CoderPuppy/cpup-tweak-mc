@@ -14,4 +14,7 @@ object VanillaMaterials {
 
 	object String extends Part.Material
 	SingletonSerialization.register(String, s"${mod.ref.modID}:tools.vanilla.string")
+
+	object Wood extends Part.Material
+	SingletonSerialization.register(Wood, s"${mod.ref.modID}:tools.vanilla.wood")
 }
