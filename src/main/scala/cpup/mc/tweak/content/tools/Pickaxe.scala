@@ -52,16 +52,30 @@ object Pickaxe {
 
 		override def getRecipeSize = 3
 
-		override def getCraftingResult(inv: InventoryCrafting) = new ItemStack(Items.diamond_pickaxe)
+		override def getCraftingResult(inv: InventoryCrafting): ItemStack = {
+			for(x <- 0 to 2) {
+				if(inv.getStackInRowAndColumn(x, 0) != null) {
+					val head = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 0)))
+					val binding = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 1)))
+					val handle = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 2)))
+					val pickaxe = Pickaxe(head, binding, handle)
+					val stack = new ItemStack(Tool.Item)
+					stack.setTagCompound(Serialized(pickaxe))
+					return stack
+				}
+			}
+			new ItemStack(Items.diamond_pickaxe)
+		}
 
 		override def matches(inv: InventoryCrafting, world: World): Boolean = {
 			var foundPattern = false
 			for(x <- 0 to 2) {
+				var foundHead = false
+				var foundBinding = false
+				var foundHandle = false
+
 				for(y <- 0 to 2) {
 					val stack = inv.getStackInRowAndColumn(x, y)
-					var foundHead = false
-					var foundBinding = false
-					var foundHandle = false
 					if(stack != null) {
 						// cancel if we've already found the pattern (and there's another item in the crafting grid)
 						if(foundPattern) return false
