@@ -77,10 +77,10 @@ object Pickaxe {
 							case _ => return false
 						}
 					}
-
-					if(foundHead && foundBinding && foundHandle) foundPattern = true
-					else if(foundHead || foundBinding || foundHandle) return false // cancel if it isn't the whole pattern
 				}
+
+				if(foundHead && foundBinding && foundHandle) foundPattern = true
+				else if(foundHead || foundBinding || foundHandle) return false // cancel if it isn't the whole pattern
 			}
 			foundPattern
 		}
