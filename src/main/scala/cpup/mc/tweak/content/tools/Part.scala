@@ -16,17 +16,17 @@ object Part {
 	trait Material
 	trait Modification
 
-	private var _materials = Map[(Material, Shape), Any]()
-	def register(material: Material, shape: Shape, stats: Any) {
+	private var _materials = Map[(Material, Shape), Stats.Modification]()
+	def register(material: Material, shape: Shape, stats: Stats.Modification) {
 		_materials += (((material, shape), stats))
 	}
 	def unregister(material: Material, shape: Shape) {
 		_materials -= ((material, shape))
 	}
 
-	private var _modifications = Map[(Modification, Material, Shape), Any]()
+	private var _modifications = Map[(Modification, Material, Shape), Stats.Modification]()
 	def modifications = _modifications
-	def register(mod: Modification, material: Material, shape: Shape, stats: Any) {
+	def register(mod: Modification, material: Material, shape: Shape, stats: Stats.Modification) {
 		_modifications += (((mod, material, shape), stats))
 	}
 	def unregister(mod: Modification, material: Material, shape: Shape) {

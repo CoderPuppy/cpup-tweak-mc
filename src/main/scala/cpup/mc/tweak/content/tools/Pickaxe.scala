@@ -10,8 +10,16 @@ import net.minecraft.init.Items
 import cpup.mc.lib.util.ItemUtil
 import net.minecraft.nbt.NBTTagCompound
 
-case class Pickaxe(head: Part, binding: Part, handle: Part) extends Tool {
+case class Pickaxe(damage: Int, head: Part, binding: Part, handle: Part) extends Tool {
 	override def parts = List(head, binding, handle)
+
+	def stats = {
+		val stats = new Stats {}
+		stats
+	}
+
+	def damage(amt: Int) = Pickaxe(damage + amt, head, binding, handle)
+	def repair(amt: Int) = Pickaxe(damage - amt, head, binding, handle)
 }
 
 object Pickaxe {
@@ -34,11 +42,12 @@ object Pickaxe {
 			nbt
 		}
 		override def readFromNBT(nbt: NBTTagCompound) = (
+			Serialized.un[Int](nbt.getCompoundTag("damage")),
 			Serialized.un[Part](nbt.getCompoundTag("head")),
 			Serialized.un[Part](nbt.getCompoundTag("binding")),
 			Serialized.un[Part](nbt.getCompoundTag("handle"))
 		) match {
-			case (head: Part, binding: Part, handle: Part) => Pickaxe(head, binding, handle)
+			case (damage: Int, head: Part, binding: Part, handle: Part) => Pickaxe(damage, head, binding, handle)
 			case r =>
 				mod.logger.warn("got {} when parsing a pickaxe", r)
 				null
@@ -58,7 +67,7 @@ object Pickaxe {
 					val head = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 0)))
 					val binding = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 1)))
 					val handle = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 2)))
-					val pickaxe = Pickaxe(head, binding, handle)
+					val pickaxe = Pickaxe(0, head, binding, handle)
 					val stack = new ItemStack(Tool.Item)
 					stack.setTagCompound(Serialized(pickaxe))
 					return stack

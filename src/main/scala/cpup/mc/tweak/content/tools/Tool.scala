@@ -12,6 +12,12 @@ import scala.collection.mutable
 
 trait Tool {
 	def parts: Seq[Part]
+
+	def stats: Stats
+
+	def damage: Int
+	def damage(amt: Int): Tool
+	def repair(amt: Int): Tool
 }
 
 object Tool {
