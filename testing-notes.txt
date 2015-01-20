@@ -37,18 +37,18 @@
 
 {id: "cpup-tweak:tools.pickaxe", data: {
 	head: {id: "cpup-tweak:tools.part", data: {
-		shape: {id: "cpup-tweak:tools.part.shape", data: { id: "pickaxe.head" }},
-		material: {id: "cpup-tweak:tools.part.material", data: { category: "metal", id: "iron" },
+		shape: {id: "cpup-tweak:tools.part.shape", data: { id: "pickaxe.head" } },
+		material: {id: "cpup-tweak:tools.part.material", data: { category: "metal", id: "iron" } },
 		modifications: {id: "cpup-mc:seq", data: []}
 	}},
 	binding: {id: "cpup-tweak:tools.part", data: {
-		shape: {id: "cpup-tweak:tools.part.shape", data: { id: "binding" }},
-		material: {id: "cpup-tweak:tools.part.material", data: { category: "fabric", id: "leather" },
+		shape: {id: "cpup-tweak:tools.part.shape", data: { id: "binding" } },
+		material: {id: "cpup-tweak:tools.part.material", data: { category: "fabric", id: "leather" } },
 		modifications: {id: "cpup-mc:seq", data: []}
 	}},
 	handle: {id: "cpup-tweak:tools.part", data: {
-		shape: {id: "cpup-tweak:tools.part.shape", data: { id: "handle" }},
-		material: {id: "cpup-tweak:tools.part.material", data: { category: "wood" }},
+		shape: {id: "cpup-tweak:tools.part.shape", data: { id: "handle" } },
+		material: {id: "cpup-tweak:tools.part.material", data: { category: "wood" } },
 		modifications: {id: "cpup-mc:seq", data: []}
 	}}
 }}
