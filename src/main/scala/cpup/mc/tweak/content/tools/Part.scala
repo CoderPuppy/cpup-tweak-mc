@@ -1,13 +1,14 @@
 package cpup.mc.tweak.content.tools
 
-import cpup.mc.tweak.content.BaseItem
-import net.minecraft.item.ItemStack
-import net.minecraft.entity.player.EntityPlayer
-import cpup.mc.lib.util.serializing.{SerializableType, Serialized, SerializationRegistry}
 import cpup.mc.lib.util.ItemUtil
-import scala.collection.mutable
-import net.minecraft.nbt.NBTTagCompound
+import cpup.mc.lib.util.serializing.{SerializableType, SerializationRegistry, Serialized}
 import cpup.mc.tweak.CPupTweak
+import cpup.mc.tweak.content.BaseItem
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.{NBTTagString, NBTTagCompound}
+import net.minecraftforge.common.util.Constants.NBT
+import scala.collection.mutable
 
 case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*) extends Stats.Modification {
 	override def modify[T](name: String, orig: T)(implicit manifest: Manifest[T]): T = {
@@ -21,23 +22,98 @@ case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.
 }
 
 object Part {
-	case class Shape(id: String, mod: Option[String] = None)
+	case class Shape(id: String, mod: Option[String] = None) {
+		override def toString: String = {
+			(mod match {
+				case Some(mod) => s"$mod:"
+				case None => ""
+			}) + id
+		}
+	}
+	object Shape extends SerializableType[Shape, NBTTagCompound] {
+		def mod = CPupTweak
+
+		override def id: String = s"${mod.ref.modID}:tools.part.shape"
+		override def nbtClass: Class[_ <: NBTTagCompound] = classOf[NBTTagCompound]
+		override def cla: Class[_ <: Shape] = classOf[Shape]
+
+		override def writeToNBT(data: Shape): NBTTagCompound = {
+			val nbt = new NBTTagCompound
+			nbt.setString("id", data.id)
+			for(mod <- data.mod) nbt.setString("mod", mod)
+			return nbt
+		}
+
+		override def readFromNBT(nbt: NBTTagCompound): Shape = Shape(
+			nbt.getString("id"),
+			if(nbt.hasKey("mod", NBT.TAG_STRING)) {
+				Some(nbt.getString("mod"))
+			} else {
+				None
+			}
+		)
+	}
+	SerializationRegistry.registerType(Shape)
 
 	// currently the categories are metal, fabric, cord (string, vines, etc...) and wood
 	// if the material can't be separated from your mod include the mod part (eg. metal.thaumcraft:thaumium)
 	// otherwise don't include it (unless you have a really good reason to) (eg. metal.copper, metal.iron, metal.tin, metal.aluminum, metal.bronze)
 	// also register zinc as tin and brass as bronze (unless you have a really good reason to)
-	case class Material(category: String, mod: Option[String] = None, inst: Option[String] = None) {
+	case class Material(category: String, mod: Option[String] = None, id: Option[String] = None) {
 		override def toString: String = (mod match {
 			case Some(mod) => s"$mod:"
 			case None => ""
-		}) + category + (inst match {
+		}) + category + (id match {
 			case Some(inst) => s".$inst"
 			case None => ""
 		})
 	}
+	object Material extends SerializableType[Material, NBTTagCompound] {
+		def mod = CPupTweak
+
+		override def id: String = s"${mod.ref.modID}:tools.part.material"
+
+		override def nbtClass: Class[_ <: NBTTagCompound] = classOf[NBTTagCompound]
+		override def cla: Class[_ <: Material] = classOf[Material]
+
+		override def writeToNBT(data: Material): NBTTagCompound = {
+			val nbt = new NBTTagCompound
+			nbt.setString("category", data.category)
+			for(mod <- data.mod) nbt.setString("mod", mod)
+			for(id <- data.id) nbt.setString("id", id)
+			return nbt
+		}
+
+		override def readFromNBT(nbt: NBTTagCompound): Material = Material(
+			nbt.getString("category"),
+			if(nbt.hasKey("mod", NBT.TAG_STRING)) {
+				Some(nbt.getString("mod"))
+			} else {
+				None
+			},
+			if(nbt.hasKey("id", NBT.TAG_STRING)) {
+				Some(nbt.getString("id"))
+			} else {
+				None
+			}
+		)
+	}
+	SerializationRegistry.registerType(Material)
 
 	case class Modification(id: String)
+	object Modification extends SerializableType[Modification, NBTTagString] {
+		def mod = CPupTweak
+
+		override def id: String = s"${mod.ref.modID}:tools.part.modification"
+
+		override def nbtClass: Class[_ <: NBTTagString] = classOf[NBTTagString]
+		override def cla: Class[_ <: Modification] = classOf[Modification]
+
+		override def writeToNBT(data: Modification): NBTTagString = new NBTTagString(data.id)
+
+		override def readFromNBT(nbt: NBTTagString): Modification = Modification(nbt.func_150285_a_)
+	}
+	SerializationRegistry.registerType(Modification)
 
 	private var _materials = Map[(Material, Shape), Stats.Modification]()
 	def register(material: Material, shape: Shape, stats: Stats.Modification) {

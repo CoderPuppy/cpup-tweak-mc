@@ -25,7 +25,7 @@ case class Pickaxe(damage: Int, head: Part, binding: Part, handle: Part) extends
 object Pickaxe {
 	def mod = CPupTweak
 
-	final val head = Part.Shape("pickaxe", Some("head"))
+	final val head = Part.Shape("pickaxe.head")
 
 	object Type extends SerializableType[Pickaxe, NBTTagCompound] {
 		def mod = CPupTweak
