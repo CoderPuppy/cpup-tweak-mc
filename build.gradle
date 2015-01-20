@@ -12,7 +12,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'net.minecraftforge.gradle:ForgeGradle:1.3-SNAPSHOT'
+		classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
 	}
 }
 
@@ -30,7 +30,7 @@ dependencies.compile "org.scala-lang:scala-library:$scala.version"
 dependencies.compile "org.scala-lang:scala-reflect:$scala.version"
 
 apply plugin: 'forge'
-ext { forge = [ mcVersion: '1.7.10', version: '10.13.0.1208' ] }
+ext { forge = [ mcVersion: '1.7.10', version: '10.13.2.1286' ] }
 minecraft {
 	version = "$forge.mcVersion-$forge.version"
 	assetDir = 'eclipse/assets'
