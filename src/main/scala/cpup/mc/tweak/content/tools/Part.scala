@@ -9,9 +9,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.{NBTTagString, NBTTagCompound}
 import net.minecraftforge.common.util.Constants.NBT
 import scala.collection.mutable
+import scala.reflect.runtime.universe.TypeTag
 
 case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*) extends Stats.Modification {
-	override def modify[T](name: String, orig: T)(implicit manifest: Manifest[T]): T = {
+	override def modify[T](name: String, orig: T)(implicit typeTag: TypeTag[T]): T = {
 		var curr = orig
 		curr = Part.getModification(material, shape).modify(name, curr)
 		for(mod <- modifications) {
@@ -122,7 +123,7 @@ object Part {
 	def unregister(material: Material, shape: Shape) {
 		_materials -= ((material, shape))
 	}
-	def getModification(material: Material, shape: Shape) = _materials((material, shape))
+	def getModification(material: Material, shape: Shape) = _materials.getOrElse((material, shape), Stats.Modification.NOOP)
 
 	private var _modifications = Map[(Modification, Option[Material], Option[Shape]), Stats.Modification]()
 	def modifications = _modifications
@@ -133,10 +134,10 @@ object Part {
 		_modifications -= ((mod, material, shape))
 	}
 	def getModification(mod: Modification, material: Material, shape: Shape) = {
-		_modifications.get((mod, Some(material), Some(shape))).getOrElse(Stats.Modification.NOOP) +
-		_modifications.get((mod, Some(material), None)).getOrElse(Stats.Modification.NOOP) +
-		_modifications.get((mod, None, Some(shape))).getOrElse(Stats.Modification.NOOP) +
-		_modifications.get((mod, None, None)).getOrElse(Stats.Modification.NOOP)
+		_modifications.getOrElse((mod, Some(material), Some(shape)), Stats.Modification.NOOP) +
+		_modifications.getOrElse((mod, Some(material), None), Stats.Modification.NOOP) +
+		_modifications.getOrElse((mod, None, Some(shape)), Stats.Modification.NOOP) +
+		_modifications.getOrElse((mod, None, None), Stats.Modification.NOOP)
 	}
 
 	object Type extends SerializableType[Part, NBTTagCompound] {
