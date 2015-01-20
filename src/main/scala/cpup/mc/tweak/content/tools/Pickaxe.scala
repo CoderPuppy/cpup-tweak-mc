@@ -25,8 +25,7 @@ case class Pickaxe(damage: Int, head: Part, binding: Part, handle: Part) extends
 object Pickaxe {
 	def mod = CPupTweak
 
-	case object Head extends Part.Shape
-	SingletonSerialization.register(Head, s"${mod.ref.modID}:tools.pickaxe.head")
+	final val head = Part.Shape("pickaxe", Some("head"))
 
 	object Type extends SerializableType[Pickaxe, NBTTagCompound] {
 		def mod = CPupTweak
@@ -94,9 +93,9 @@ object Pickaxe {
 						// TODO: handle sticks
 						if(part == null) return false
 						y match {
-							case 0 if part.shape == Pickaxe.Head => foundHead = true
-							case 1 if part.shape == GenericParts.Binding => foundBinding = true
-							case 2 if part.shape == GenericParts.Handle => foundHandle = true
+							case 0 if part.shape == Pickaxe.head => foundHead = true
+							case 1 if part.shape == GenericParts.binding => foundBinding = true
+							case 2 if part.shape == GenericParts.handle => foundHandle = true
 							case _ => return false
 						}
 					}

@@ -10,7 +10,7 @@ import cpup.mc.lib.util.ItemUtil
 import net.minecraft.nbt.NBTTagCompound
 import scala.collection.mutable
 
-trait Tool {
+trait Tool extends Stats.Modification {
 	def parts: Seq[Part]
 
 	def stats: Stats
@@ -18,13 +18,30 @@ trait Tool {
 	def damage: Int
 	def damage(amt: Int): Tool
 	def repair(amt: Int): Tool
+
+	def modify[T](name: String, orig: T)(implicit manifest: Manifest[T]) = {
+		var curr = orig
+		for(part <- parts) {
+			curr = part.modify(name, curr)
+		}
+		curr
+	}
 }
 
 object Tool {
+	def getStat[T](stack: ItemStack, name: String, orig: T)(implicit manifest: Manifest[T]) = SerializationRegistry.read[Tool](stack) match {
+		case tool: Tool =>
+			tool.modify[T](name, orig)
+
+		case null => orig
+	}
+
 	object Item extends BaseItem {
 		name = "tool"
 
-		override def canHarvestBlock(block: Block, stack: ItemStack) = true
+//		override def canHarvestBlock(block: Block, stack: ItemStack) = true
+
+		override def getHarvestLevel(stack: ItemStack, toolClass: String): Int = getStat[Int](stack, s"harvest-level:$toolClass", 0)
 
 		override def onBlockStartBreak(stack: ItemStack, x: Int, y: Int, z: Int, player: EntityPlayer) = {
 			false

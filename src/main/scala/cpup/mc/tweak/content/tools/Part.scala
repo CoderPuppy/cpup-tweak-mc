@@ -9,12 +9,35 @@ import scala.collection.mutable
 import net.minecraft.nbt.NBTTagCompound
 import cpup.mc.tweak.CPupTweak
 
-case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*)
+case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*) extends Stats.Modification {
+	override def modify[T](name: String, orig: T)(implicit manifest: Manifest[T]): T = {
+		var curr = orig
+		curr = Part.getModification(material, shape).modify(name, curr)
+		for(mod <- modifications) {
+			curr = Part.getModification(mod, material, shape).modify(name, curr)
+		}
+		curr
+	}
+}
 
 object Part {
-	trait Shape
-	trait Material
-	trait Modification
+	case class Shape(id: String, mod: Option[String] = None)
+
+	// currently the categories are metal, fabric, cord (string, vines, etc...) and wood
+	// if the material can't be separated from your mod include the mod part (eg. metal.thaumcraft:thaumium)
+	// otherwise don't include it (unless you have a really good reason to) (eg. metal.copper, metal.iron, metal.tin, metal.aluminum, metal.bronze)
+	// also register zinc as tin and brass as bronze (unless you have a really good reason to)
+	case class Material(category: String, mod: Option[String] = None, inst: Option[String] = None) {
+		override def toString: String = (mod match {
+			case Some(mod) => s"$mod:"
+			case None => ""
+		}) + category + (inst match {
+			case Some(inst) => s".$inst"
+			case None => ""
+		})
+	}
+
+	case class Modification(id: String)
 
 	private var _materials = Map[(Material, Shape), Stats.Modification]()
 	def register(material: Material, shape: Shape, stats: Stats.Modification) {
@@ -23,14 +46,21 @@ object Part {
 	def unregister(material: Material, shape: Shape) {
 		_materials -= ((material, shape))
 	}
+	def getModification(material: Material, shape: Shape) = _materials((material, shape))
 
-	private var _modifications = Map[(Modification, Material, Shape), Stats.Modification]()
+	private var _modifications = Map[(Modification, Option[Material], Option[Shape]), Stats.Modification]()
 	def modifications = _modifications
-	def register(mod: Modification, material: Material, shape: Shape, stats: Stats.Modification) {
+	def register(mod: Modification, material: Option[Material], shape: Option[Shape], stats: Stats.Modification) {
 		_modifications += (((mod, material, shape), stats))
 	}
-	def unregister(mod: Modification, material: Material, shape: Shape) {
+	def unregister(mod: Modification, material: Option[Material], shape: Option[Shape]) {
 		_modifications -= ((mod, material, shape))
+	}
+	def getModification(mod: Modification, material: Material, shape: Shape) = {
+		_modifications.get((mod, Some(material), Some(shape))).getOrElse(Stats.Modification.NOOP) +
+		_modifications.get((mod, Some(material), None)).getOrElse(Stats.Modification.NOOP) +
+		_modifications.get((mod, None, Some(shape))).getOrElse(Stats.Modification.NOOP) +
+		_modifications.get((mod, None, None)).getOrElse(Stats.Modification.NOOP)
 	}
 
 	object Type extends SerializableType[Part, NBTTagCompound] {

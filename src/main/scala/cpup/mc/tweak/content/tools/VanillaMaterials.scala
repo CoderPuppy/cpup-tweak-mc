@@ -6,15 +6,11 @@ import cpup.mc.tweak.CPupTweak
 object VanillaMaterials {
 	def mod = CPupTweak
 
-	case object Iron extends Part.Material
-	SingletonSerialization.register(Iron, s"${mod.ref.modID}:tools.vanilla.iron")
-
-	case object Leather extends Part.Material
-	SingletonSerialization.register(Leather, s"${mod.ref.modID}:tools.vanilla.leather")
-
-	case object String extends Part.Material
-	SingletonSerialization.register(String, s"${mod.ref.modID}:tools.vanilla.string")
-
-	case object Wood extends Part.Material
-	SingletonSerialization.register(Wood, s"${mod.ref.modID}:tools.vanilla.wood")
+	final val iron = Part.Material("metal.iron")
+	final val gold = Part.Material("metal.gold")
+	final val leather = Part.Material("fabric.leather")
+	final val string = Part.Material("cord.string")
+	final val vine = Part.Material("cord.vine")
+	final val stone = Part.Material("stone")
+	final val wood = Part.Material("wood")
 }
