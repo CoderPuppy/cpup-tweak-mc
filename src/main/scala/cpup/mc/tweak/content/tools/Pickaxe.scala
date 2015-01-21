@@ -34,13 +34,14 @@ object Pickaxe {
 		override def nbtClass = classOf[NBTTagCompound]
 		override def writeToNBT(pickaxe: Pickaxe) = {
 			val nbt = new NBTTagCompound
+			nbt.setInteger("damage", pickaxe.damage)
 			nbt.setTag("head", Serialized(pickaxe.head))
 			nbt.setTag("binding", Serialized(pickaxe.binding))
 			nbt.setTag("handle", Serialized(pickaxe.handle))
 			nbt
 		}
 		override def readFromNBT(nbt: NBTTagCompound) = (
-			Serialized.un[Int](nbt.getCompoundTag("damage")),
+			Some(nbt.getInteger("damage")),
 			Serialized.un[Part](nbt.getCompoundTag("head")),
 			Serialized.un[Part](nbt.getCompoundTag("binding")),
 			Serialized.un[Part](nbt.getCompoundTag("handle"))
@@ -57,10 +58,10 @@ object Pickaxe {
 		def width = 1
 		def height = 3
 
-		override def parse(inv: InventoryCrafting, ox: Int, oy: Int, data: Array[Array[ItemStack]]): Option[Pickaxe] = (
-			Serialized.un[Part](data(0)(0)),
-			Serialized.un[Part](data(0)(1)),
-			Serialized.un[Part](data(0)(2))
+		override def parse(inv: InventoryCrafting, ox: Int, oy: Int, data: Array[Array[Option[ItemStack]]]): Option[Pickaxe] = (
+			data(0)(0).flatMap(Serialized.un[Part]),
+			data(0)(1).flatMap(Serialized.un[Part]),
+			data(0)(2).flatMap(Serialized.un[Part])
 		) match {
 			case (Some(head), Some(binding), Some(handle))
 				if head.shape == Pickaxe.head && binding.shape == GenericParts.binding && handle.shape == GenericParts.handle =>

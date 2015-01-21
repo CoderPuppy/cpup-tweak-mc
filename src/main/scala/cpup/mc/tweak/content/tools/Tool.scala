@@ -35,10 +35,7 @@ trait Tool extends Stats.Modifier {
 }
 
 object Tool {
-	def getModifier(stack: ItemStack) = Serialized.un[Tool](stack) match {
-		case tool: Tool => tool
-		case _ => Stats.Modifier.NOOP
-	}
+	def getModifier(stack: ItemStack) = Serialized.un[Tool](stack).getOrElse(Stats.Modifier.NOOP)
 
 	object Item extends BaseItem {
 		name = "tool"

@@ -50,5 +50,6 @@
 		shape: {id: "cpup-tweak:tools.part.shape", data: { id: "handle" } },
 		material: {id: "cpup-tweak:tools.part.material", data: { category: "wood" } },
 		modifications: {id: "cpup-mc:seq", data: []}
-	}}
+	}},
+	damage: 0
 }}
