@@ -16,22 +16,23 @@ object Tools {
 
 		registrar.registerRecipe(Pickaxe.Recipe)
 
-		Part.register(VanillaMaterials.leather, GenericParts.binding, Stats.Modification.NOOP)
-		Part.register(VanillaMaterials.string, GenericParts.binding, Stats.Modification.NOOP)
+		Part.register(VanillaMaterials.leather, GenericParts.binding, Stats.Modifier.NOOP)
+		Part.register(VanillaMaterials.string, GenericParts.binding, Stats.Modifier.NOOP)
 		Part.register(VanillaMaterials.iron, Pickaxe.head,
-			Stats.Modification.NVal("harvest-level:pickaxe", 2) +
-			Stats.Modification.NFun[Int]("damage", _ + 3)
+			Stats.Modifier.NVal("harvest-level:pickaxe", 2) +
+			Stats.Modifier.NFun("dig-speed:pickaxe", _ * 6) +
+			Stats.Modifier.NFun[Int]("damage", _ + 3)
 		)
 		Part.register(VanillaMaterials.stone, Pickaxe.head,
-			Stats.Modification.NVal("harvest-level:pickaxe", 1) +
-			Stats.Modification.NFun[Int]("damage", _ + 2)
+			Stats.Modifier.NVal("harvest-level:pickaxe", 1) +
+			Stats.Modifier.NFun[Int]("damage", _ + 2)
 		)
 		Part.register(VanillaMaterials.wood, GenericParts.handle,
-			Stats.Modification.NFun[Int]("damage", _ + 1)
+			Stats.Modifier.NFun[Int]("damage", _ + 1)
 		)
 
 		// Wrap the handle in leather and use half the amount of food (theoretically)
-		Part.register(GenericModifications.wrapping(VanillaMaterials.leather), None, Some(GenericParts.handle), new Stats.Modification {
+		Part.register(GenericModifications.wrapping(VanillaMaterials.leather), None, Some(GenericParts.handle), new Stats.Modifier {
 			override def modify[T](name: String, orig: T)(implicit typeTag: TypeTag[T]): T = (name match {
 				case "exhaustion" if orig.isInstanceOf[Double] =>
 					orig.asInstanceOf[Double] * 0.5

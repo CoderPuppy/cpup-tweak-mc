@@ -7,6 +7,7 @@ import cpup.mc.lib.content.CPupItem
 import cpup.mc.lib.util.ItemUtil
 import cpup.mc.lib.util.serializing.SerializationRegistry
 import cpup.mc.tweak.content.BaseItem
+import net.minecraft.block.Block
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.ai.attributes.AttributeModifier
 import net.minecraft.entity.player.EntityPlayer
@@ -15,7 +16,7 @@ import scala.reflect.runtime.universe.TypeTag
 
 import scala.collection.{JavaConversions, mutable}
 
-trait Tool extends Stats.Modification {
+trait Tool extends Stats.Modifier {
 	def parts: Seq[Part]
 
 	def stats: Stats
@@ -34,11 +35,9 @@ trait Tool extends Stats.Modification {
 }
 
 object Tool {
-	def getStat[T](stack: ItemStack, name: String, orig: T)(implicit typeTag: TypeTag[T]) = SerializationRegistry.read[Tool](stack) match {
-		case tool: Tool =>
-			tool.modify[T](name, orig)
-
-		case null => orig
+	def getModifier(stack: ItemStack) = SerializationRegistry.read[Tool](stack) match {
+		case tool: Tool => tool
+		case _ => Stats.Modifier.NOOP
 	}
 
 	object Item extends BaseItem {
@@ -48,7 +47,17 @@ object Tool {
 
 //		override def canHarvestBlock(block: Block, stack: ItemStack) = true
 
-		override def getHarvestLevel(stack: ItemStack, toolClass: String): Int = getStat[Int](stack, s"harvest-level:$toolClass", 0)
+		override def getHarvestLevel(stack: ItemStack, toolClass: String): Int = getModifier(stack).modify[Int](s"harvest-level:$toolClass", -1)
+
+		override def getDigSpeed(stack: ItemStack, block: Block, meta: Int): Float = {
+			val modifier = getModifier(stack)
+			val toolClass = block.getHarvestTool(meta)
+			if(modifier.modify[Int](s"harvest-level:$toolClass", -1) >= block.getHarvestLevel(meta)) {
+				modifier.modify[Float](s"dig-speed:$toolClass", 1)
+			} else {
+				super.getDigSpeed(stack, block, meta)
+			}
+		}
 
 		override def onBlockStartBreak(stack: ItemStack, x: Int, y: Int, z: Int, player: EntityPlayer) = {
 			false
@@ -74,7 +83,7 @@ object Tool {
 		override def getAttributeModifiers(stack: ItemStack): Multimap[_, _] = {
 			val multimap = super.getAttributeModifiers(stack).asInstanceOf[Multimap[String, AttributeModifier]]
 			multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName, new AttributeModifier(CPupItem.itemUUID, "Weapon modifier",
-				getStat[Int](stack, "damage", 0), 0))
+				getModifier(stack).modify[Int]("damage", 0), 0))
 			return multimap
 		}
 	}

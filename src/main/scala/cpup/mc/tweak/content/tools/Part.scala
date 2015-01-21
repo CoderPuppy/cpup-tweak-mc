@@ -11,7 +11,7 @@ import net.minecraftforge.common.util.Constants.NBT
 import scala.collection.mutable
 import scala.reflect.runtime.universe.TypeTag
 
-case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modification*) extends Stats.Modification {
+case class Part(shape: Part.Shape, material: Part.Material, modifications: Part.Modifier*) extends Stats.Modifier {
 	override def modify[T](name: String, orig: T)(implicit typeTag: TypeTag[T]): T = {
 		var curr = orig
 		curr = Part.getModification(material, shape).modify(name, curr)
@@ -101,43 +101,43 @@ object Part {
 	}
 	SerializationRegistry.registerType(Material)
 
-	case class Modification(id: String)
-	object Modification extends SerializableType[Modification, NBTTagString] {
+	case class Modifier(id: String)
+	object Modifier extends SerializableType[Modifier, NBTTagString] {
 		def mod = CPupTweak
 
 		override def id: String = s"${mod.ref.modID}:tools.part.modification"
 
 		override def nbtClass: Class[_ <: NBTTagString] = classOf[NBTTagString]
-		override def cla: Class[_ <: Modification] = classOf[Modification]
+		override def cla: Class[_ <: Modifier] = classOf[Modifier]
 
-		override def writeToNBT(data: Modification): NBTTagString = new NBTTagString(data.id)
+		override def writeToNBT(data: Modifier): NBTTagString = new NBTTagString(data.id)
 
-		override def readFromNBT(nbt: NBTTagString): Modification = Modification(nbt.func_150285_a_)
+		override def readFromNBT(nbt: NBTTagString): Modifier = Modifier(nbt.func_150285_a_)
 	}
-	SerializationRegistry.registerType(Modification)
+	SerializationRegistry.registerType(Modifier)
 
-	private var _materials = Map[(Material, Shape), Stats.Modification]()
-	def register(material: Material, shape: Shape, stats: Stats.Modification) {
+	private var _materials = Map[(Material, Shape), Stats.Modifier]()
+	def register(material: Material, shape: Shape, stats: Stats.Modifier) {
 		_materials += (((material, shape), stats))
 	}
 	def unregister(material: Material, shape: Shape) {
 		_materials -= ((material, shape))
 	}
-	def getModification(material: Material, shape: Shape) = _materials.getOrElse((material, shape), Stats.Modification.NOOP)
+	def getModification(material: Material, shape: Shape) = _materials.getOrElse((material, shape), Stats.Modifier.NOOP)
 
-	private var _modifications = Map[(Modification, Option[Material], Option[Shape]), Stats.Modification]()
+	private var _modifications = Map[(Modifier, Option[Material], Option[Shape]), Stats.Modifier]()
 	def modifications = _modifications
-	def register(mod: Modification, material: Option[Material], shape: Option[Shape], stats: Stats.Modification) {
+	def register(mod: Modifier, material: Option[Material], shape: Option[Shape], stats: Stats.Modifier) {
 		_modifications += (((mod, material, shape), stats))
 	}
-	def unregister(mod: Modification, material: Option[Material], shape: Option[Shape]) {
+	def unregister(mod: Modifier, material: Option[Material], shape: Option[Shape]) {
 		_modifications -= ((mod, material, shape))
 	}
-	def getModification(mod: Modification, material: Material, shape: Shape) = {
-		_modifications.getOrElse((mod, Some(material), Some(shape)), Stats.Modification.NOOP) +
-		_modifications.getOrElse((mod, Some(material), None), Stats.Modification.NOOP) +
-		_modifications.getOrElse((mod, None, Some(shape)), Stats.Modification.NOOP) +
-		_modifications.getOrElse((mod, None, None), Stats.Modification.NOOP)
+	def getModification(mod: Modifier, material: Material, shape: Shape) = {
+		_modifications.getOrElse((mod, Some(material), Some(shape)), Stats.Modifier.NOOP) +
+		_modifications.getOrElse((mod, Some(material), None), Stats.Modifier.NOOP) +
+		_modifications.getOrElse((mod, None, Some(shape)), Stats.Modifier.NOOP) +
+		_modifications.getOrElse((mod, None, None), Stats.Modifier.NOOP)
 	}
 
 	object Type extends SerializableType[Part, NBTTagCompound] {
@@ -156,9 +156,9 @@ object Part {
 		override def readFromNBT(nbt: NBTTagCompound) = (
 			Serialized.un[Part.Shape](nbt.getCompoundTag("shape")),
 			Serialized.un[Part.Material](nbt.getCompoundTag("material")),
-			Serialized.un[List[Part.Modification]](nbt.getCompoundTag("modifications"))
+			Serialized.un[List[Part.Modifier]](nbt.getCompoundTag("modifications"))
 		) match {
-			case (shape: Part.Shape, material: Part.Material, modifications: List[Part.Modification]) =>
+			case (shape: Part.Shape, material: Part.Material, modifications: List[Part.Modifier]) =>
 				Part(shape, material, modifications: _*)
 
 			case r =>
