@@ -60,7 +60,7 @@ object Part {
 	// if the material can't be separated from your mod include the mod part (eg. metal.thaumcraft:thaumium)
 	// otherwise don't include it (unless you have a really good reason to) (eg. metal.copper, metal.iron, metal.tin, metal.aluminum, metal.bronze)
 	// also register zinc as tin and brass as bronze (unless you have a really good reason to)
-	case class Material(category: String, mod: Option[String] = None, id: Option[String] = None) {
+	case class Material(category: String, id: Option[String] = None, mod: Option[String] = None) {
 		override def toString: String = (mod match {
 			case Some(mod) => s"$mod:"
 			case None => ""
@@ -87,13 +87,13 @@ object Part {
 
 		override def readFromNBT(nbt: NBTTagCompound): Material = Material(
 			nbt.getString("category"),
-			if(nbt.hasKey("mod", NBT.TAG_STRING)) {
-				Some(nbt.getString("mod"))
+			if(nbt.hasKey("id", NBT.TAG_STRING)) {
+				Some(nbt.getString("id"))
 			} else {
 				None
 			},
-			if(nbt.hasKey("id", NBT.TAG_STRING)) {
-				Some(nbt.getString("id"))
+			if(nbt.hasKey("mod", NBT.TAG_STRING)) {
+				Some(nbt.getString("mod"))
 			} else {
 				None
 			}
