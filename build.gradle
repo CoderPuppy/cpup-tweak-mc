@@ -33,7 +33,7 @@ apply plugin: 'forge'
 ext { forge = [ mcVersion: '1.7.10', version: '10.13.2.1286' ] }
 minecraft {
 	version = "$forge.mcVersion-$forge.version"
-	assetDir = 'eclipse/assets'
+	runDir = 'eclipse'
 }
 
 apply plugin: 'maven'
