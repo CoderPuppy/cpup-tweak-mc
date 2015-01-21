@@ -2,10 +2,6 @@ package cpup.mc.tweak.content.tools
 
 import scala.reflect.runtime.universe.TypeTag
 
-class Stats {
-
-}
-
 object Stats {
 	trait Modifier {
 		def modify[T](name: String, orig: T)(implicit typeTag: TypeTag[T]): T
@@ -49,5 +45,17 @@ object Stats {
 		}
 		type NVal[MT] = NValue[MT]
 		def NVal[MT](name: String, value: MT)(implicit matchTypeTag: TypeTag[MT]) = NValue(name, value)
+	}
+
+	implicit case class RichModifier(modifier: Modifier) {
+		def effectiveAgainst(toolClass: String) = harvestLevel(toolClass) >= 0
+		def harvestLevel(toolClass: String) = modifier.modify[Int](s"harvest-level:$toolClass", -1)
+		def digSpeed(toolClass: String) = modifier.modify[Float](s"dig-speed:$toolClass", 1f)
+		def toolClasses = RichModifier.toolClasses.filter(effectiveAgainst)
+
+		def damage = modifier.modify[Int]("damage", 0)
+	}
+	object RichModifier {
+		final val toolClasses = Set("pickaxe", "axe", "shovel")
 	}
 }

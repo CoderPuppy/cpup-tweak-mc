@@ -12,11 +12,6 @@ import net.minecraft.nbt.NBTTagCompound
 case class Pickaxe(damage: Int, head: Part, binding: Part, handle: Part) extends Tool {
 	override def parts = List(head, binding, handle)
 
-	def stats = {
-		val stats = new Stats {}
-		stats
-	}
-
 	def damage(amt: Int) = Pickaxe(damage + amt, head, binding, handle)
 	def repair(amt: Int) = Pickaxe(damage - amt, head, binding, handle)
 }
