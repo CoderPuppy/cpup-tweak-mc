@@ -5,7 +5,7 @@ import java.util
 import com.google.common.collect.Multimap
 import cpup.mc.lib.content.CPupItem
 import cpup.mc.lib.util.ItemUtil
-import cpup.mc.lib.util.serializing.SerializationRegistry
+import cpup.mc.lib.util.serializing.{Serialized, SerializationRegistry}
 import cpup.mc.tweak.content.BaseItem
 import net.minecraft.block.Block
 import net.minecraft.entity.SharedMonsterAttributes
@@ -35,7 +35,7 @@ trait Tool extends Stats.Modifier {
 }
 
 object Tool {
-	def getModifier(stack: ItemStack) = SerializationRegistry.read[Tool](stack) match {
+	def getModifier(stack: ItemStack) = Serialized.un[Tool](stack) match {
 		case tool: Tool => tool
 		case _ => Stats.Modifier.NOOP
 	}
@@ -63,19 +63,18 @@ object Tool {
 			false
 		}
 
-		override def getToolClasses(stack: ItemStack): util.Set[String] = {
-			val tool = SerializationRegistry.read[Tool](stack)
-			JavaConversions.setAsJavaSet(toolClasses.filter((name) =>
+		override def getToolClasses(stack: ItemStack): util.Set[String] = Serialized.un[Tool](stack).map(tool => {
+			JavaConversions.setAsJavaSet(toolClasses.filter(name => {
 				tool.modify[Int](s"harvest-level:$name", -1) >= 0
-			))
-		}
+			}))
+		}).getOrElse(new util.HashSet[String])
 
 		override def addLore(stack: ItemStack, player: EntityPlayer, lore: mutable.Buffer[String], advanced: Boolean) {
 			super.addLore(stack, player, lore, advanced)
 			if(advanced) {
-				lore += (SerializationRegistry.readFromNBT[Tool](ItemUtil.compound(stack)) match {
-					case tool: Tool => tool.toString
-					case null => "Not a Tool: null"
+				lore += (Serialized.un[Tool](stack) match {
+					case Some(tool) => tool.toString
+					case None => "Not a Tool"
 				})
 			}
 		}

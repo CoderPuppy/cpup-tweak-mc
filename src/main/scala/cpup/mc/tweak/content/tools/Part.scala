@@ -158,7 +158,7 @@ object Part {
 			Serialized.un[Part.Material](nbt.getCompoundTag("material")),
 			Serialized.un[List[Part.Modifier]](nbt.getCompoundTag("modifications"))
 		) match {
-			case (shape: Part.Shape, material: Part.Material, modifications: List[Part.Modifier]) =>
+			case (Some(shape), Some(material), Some(modifications)) =>
 				Part(shape, material, modifications: _*)
 
 			case r =>
@@ -176,9 +176,9 @@ object Part {
 			super.addLore(stack, player, lore, advanced)
 			if(advanced) {
 				lore += ItemUtil.compound(stack).toString
-				lore += (SerializationRegistry.readFromNBT[Part](ItemUtil.compound(stack)) match {
-					case part: Part => part.toString
-					case null => "Not a Part: null"
+				lore += (Serialized.un[Part](stack) match {
+					case Some(part) => part.toString
+					case None => "Not a Part"
 				})
 			}
 		}

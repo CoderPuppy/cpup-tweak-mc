@@ -1,13 +1,12 @@
 package cpup.mc.tweak.content.tools
 
+import cpup.mc.lib.content.CPupRecipe
+import cpup.mc.lib.util.ItemUtil
+import cpup.mc.lib.util.serializing.{SerializableType, SerializationRegistry, Serialized}
+import cpup.mc.tweak.CPupTweak
 import cpup.mc.tweak.content.BaseRecipe
 import net.minecraft.inventory.InventoryCrafting
-import net.minecraft.world.World
-import cpup.mc.tweak.CPupTweak
-import cpup.mc.lib.util.serializing.{Serialized, SerializableType, SerializationRegistry, SingletonSerialization}
 import net.minecraft.item.ItemStack
-import net.minecraft.init.Items
-import cpup.mc.lib.util.ItemUtil
 import net.minecraft.nbt.NBTTagCompound
 
 case class Pickaxe(damage: Int, head: Part, binding: Part, handle: Part) extends Tool {
@@ -46,7 +45,7 @@ object Pickaxe {
 			Serialized.un[Part](nbt.getCompoundTag("binding")),
 			Serialized.un[Part](nbt.getCompoundTag("handle"))
 		) match {
-			case (damage: Int, head: Part, binding: Part, handle: Part) => Pickaxe(damage, head, binding, handle)
+			case (Some(damage), Some(head), Some(binding), Some(handle)) => Pickaxe(damage, head, binding, handle)
 			case r =>
 				mod.logger.warn("got {} when parsing a pickaxe", r)
 				null
@@ -54,57 +53,20 @@ object Pickaxe {
 	}
 	SerializationRegistry.registerType(Type)
 
-	object Recipe extends BaseRecipe {
-//		def width = 1
-//		def height = 3
+	object Recipe extends BaseRecipe with CPupRecipe.Shaped[Pickaxe] {
+		def width = 1
+		def height = 3
 
-		override def getRecipeSize = 3
-
-		override def getCraftingResult(inv: InventoryCrafting): ItemStack = {
-			for(x <- 0 to 2) {
-				if(inv.getStackInRowAndColumn(x, 0) != null) {
-					val head = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 0)))
-					val binding = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 1)))
-					val handle = Serialized.un[Part](ItemUtil.compound(inv.getStackInRowAndColumn(x, 2)))
-					val pickaxe = Pickaxe(0, head, binding, handle)
-					val stack = new ItemStack(Tool.Item)
-					stack.setTagCompound(Serialized(pickaxe))
-					return stack
-				}
-			}
-			new ItemStack(Items.diamond_pickaxe)
+		override def parse(inv: InventoryCrafting, ox: Int, oy: Int, data: Array[Array[ItemStack]]): Option[Pickaxe] = (
+			Serialized.un[Part](data(0)(0)),
+			Serialized.un[Part](data(0)(1)),
+			Serialized.un[Part](data(0)(2))
+		) match {
+			case (Some(head), Some(binding), Some(handle))
+				if head.shape == Pickaxe.head && binding.shape == GenericParts.binding && handle.shape == GenericParts.handle =>
+				Some(Pickaxe(0, head, binding, handle))
+			case _ => None
 		}
-
-		override def matches(inv: InventoryCrafting, world: World): Boolean = {
-			var foundPattern = false
-			for(x <- 0 to 2) {
-				var foundHead = false
-				var foundBinding = false
-				var foundHandle = false
-
-				for(y <- 0 to 2) {
-					val stack = inv.getStackInRowAndColumn(x, y)
-					if(stack != null) {
-						// cancel if we've already found the pattern (and there's another item in the crafting grid)
-						if(foundPattern) return false
-
-						val part = SerializationRegistry.readFromNBT[Part](ItemUtil.compound(stack))
-						// cancel if there's a non-part item in the crafting grid
-						// TODO: handle sticks
-						if(part == null) return false
-						y match {
-							case 0 if part.shape == Pickaxe.head => foundHead = true
-							case 1 if part.shape == GenericParts.binding => foundBinding = true
-							case 2 if part.shape == GenericParts.handle => foundHandle = true
-							case _ => return false
-						}
-					}
-				}
-
-				if(foundHead && foundBinding && foundHandle) foundPattern = true
-				else if(foundHead || foundBinding || foundHandle) return false // cancel if it isn't the whole pattern
-			}
-			foundPattern
-		}
+		override def result(pick: Pickaxe): ItemStack = ItemUtil.withNBT(new ItemStack(Tool.Item), Serialized(pick))
 	}
 }
