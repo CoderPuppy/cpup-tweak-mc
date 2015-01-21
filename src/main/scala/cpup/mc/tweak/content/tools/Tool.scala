@@ -56,9 +56,6 @@ object Tool {
 
 		override def getToolClasses(stack: ItemStack): util.Set[String] = {
 			val tool = SerializationRegistry.read[Tool](stack)
-			mod.logger.info("tool classes: {}", toolClasses.filter((name) =>
-				tool.modify[Int](s"harvest-level:$name", -1) >= 0
-			))
 			JavaConversions.setAsJavaSet(toolClasses.filter((name) =>
 				tool.modify[Int](s"harvest-level:$name", -1) >= 0
 			))
