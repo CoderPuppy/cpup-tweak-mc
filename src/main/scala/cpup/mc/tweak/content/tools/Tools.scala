@@ -20,7 +20,7 @@ object Tools {
 		Part.register(VanillaMaterials.string, GenericParts.binding, Stats.Modifier.NOOP)
 		Part.register(VanillaMaterials.iron, Pickaxe.head,
 			Stats.Modifier.NVal("harvest-level:pickaxe", 2) +
-			Stats.Modifier.NFun("dig-speed:pickaxe", _ * 6) +
+			Stats.Modifier.NFun[Int]("dig-speed:pickaxe", _ * 6) +
 			Stats.Modifier.NFun[Int]("damage", _ + 3)
 		)
 		Part.register(VanillaMaterials.stone, Pickaxe.head,
