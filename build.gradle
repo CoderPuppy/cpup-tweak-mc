@@ -21,6 +21,7 @@ apply plugin: 'java'
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven { url = "http://maven.cil.li/" }
 }
 
 apply plugin: 'scala'
@@ -30,9 +31,9 @@ dependencies.compile "org.scala-lang:scala-library:$scala.version"
 dependencies.compile "org.scala-lang:scala-reflect:$scala.version"
 
 apply plugin: 'forge'
-ext { forge = [ mcVersion: '1.7.10', version: '10.13.2.1286' ] }
+ext { forge = [ mcVersion: '1.7.10', version: '10.13.2.1343' ] }
 minecraft {
-	version = "$forge.mcVersion-$forge.version"
+	version = "$forge.mcVersion-$forge.version-$forge.mcVersion"
 	runDir = 'eclipse'
 }
 
@@ -44,6 +45,7 @@ version = 'dev'
 dependencies {
 	compile 'cpup.lib:cpup-lib:dev'
 	compile 'cpup.mc.lib:cpup-mc:dev'
+	compile "li.cil.oc:OpenComputers:MC1.7.10-1.5.+:dev"
 }
 
 processResources {

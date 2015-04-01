@@ -47,7 +47,7 @@ object Stats {
 		def NVal[MT](name: String, value: MT)(implicit matchTypeTag: TypeTag[MT]) = NValue(name, value)
 	}
 
-	implicit case class RichModifier(modifier: Modifier) {
+	implicit class RichModifier(modifier: Modifier) {
 		def effectiveAgainst(toolClass: String) = harvestLevel(toolClass) >= 0
 		def harvestLevel(toolClass: String) = modifier.modify[Int](s"harvest-level:$toolClass", -1)
 		def digSpeed(toolClass: String) = modifier.modify[Float](s"dig-speed:$toolClass", 1f)
