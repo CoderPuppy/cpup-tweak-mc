@@ -1,14 +1,15 @@
 package cpup.mc.tweak.content.assistant
 
+import java.util.UUID
+
 import cofh.api.energy.IEnergyStorage
-import net.minecraft.entity.EntityAgeable
-import net.minecraft.entity.ai.EntityAIFollowOwner
-import net.minecraft.entity.passive.EntityTameable
+import com.mojang.authlib.GameProfile
+import net.minecraft
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.world.World
-import net.minecraft
 
-class Entity(world: World) extends minecraft.entity.Entity(world) with IEnergyStorage {
+class Entity(world: World, _x: Int, _y: Int, _z: Int) extends minecraft.entity.Entity(world) with IEnergyStorage {
+	setPosition(_x, _y, _z)
 	dataWatcher.addObject(18, 0)
 
 	override def entityInit {}
@@ -20,14 +21,17 @@ class Entity(world: World) extends minecraft.entity.Entity(world) with IEnergySt
 	def energy_=(n: Int) = { dataWatcher.updateObject(18, n); n }
 	final val maxEnergy = 10000 // TODO: config option
 
+	var owner: GameProfile = null
+
 	override def writeEntityToNBT(nbt: NBTTagCompound) {
-		super.writeEntityToNBT(nbt)
 		nbt.setInteger("energy", energy)
+		nbt.setString("ownerName", owner.getName)
+		nbt.setString("ownerUUID", owner.getId.toString)
 	}
 
 	override def readEntityFromNBT(nbt: NBTTagCompound) {
-		super.readFromNBT(nbt)
 		energy = nbt.getInteger("energy")
+		owner = new GameProfile(UUID.fromString(nbt.getString("ownerUUID")), nbt.getString("ownerName"))
 	}
 
 	override def receiveEnergy(maxReceive: Int, simulate: Boolean): Int = {

@@ -31,17 +31,23 @@ object Render extends entity.Render {
 
 		val body = new ModelRenderer(this, "body")
 
-		setTextureOffset("body.top", 0, 0)
-		body.addBox("top", 2, 6, 2, 4, 4, 4).rotateAngleX = math.toRadians(45).toFloat
 		setTextureOffset("body.middle", 0, 0)
-//		body.addBox("middle", -2, -4, -2, 4, 8, 4)
-		setTextureOffset("body.bottom", 0, 0)
-		body.addBox("bottom", -2, -6, -2, 4, 4, 4).rotateAngleX = math.toRadians(45).toFloat
+		body.addBox("middle", -2, -2, -2, 4, 4, 4).rotateAngleX = math.toRadians(45).toFloat
+
+		val smeltingWing = new ModelRenderer(this, "smelting-wing")
+
+		val craftingWing = new ModelRenderer(this, "crafting-wing")
+
+		val storageWing = new ModelRenderer(this, "storage-wing")
 
 		override def render(entity: minecraft.entity.Entity, f1: Float, f2: Float, f3: Float, f4: Float, f5: Float, f6: Float) {
 			val assistant = entity.asInstanceOf[Entity]
 
 			body.render(scale)
+
+			smeltingWing.render(scale)
+			craftingWing.render(scale)
+			storageWing.render(scale)
 		}
 	}
 }
