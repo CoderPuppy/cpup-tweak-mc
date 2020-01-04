@@ -1,7 +1,7 @@
 package cpup.mc.tweak.content.tools
 
+import cpup.mc.lib.util.serialization.SingletonSerialization
 import cpup.mc.tweak.CPupTweak
-import cpup.mc.lib.util.serializing.SingletonSerialization
 
 object GenericParts {
 	def mod = CPupTweak

@@ -4,9 +4,9 @@ import java.util
 
 import com.google.common.collect.Multimap
 import cpup.mc.lib.content.CPupItem
-import cpup.mc.lib.util.serializing.Serialized
+import cpup.mc.lib.util.serialization.Serialized
+import Stats.RichModifier
 import cpup.mc.tweak.content.BaseItem
-import cpup.mc.tweak.content.tools.Stats.RichModifier
 import net.minecraft.block.Block
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.ai.attributes.AttributeModifier
@@ -33,7 +33,7 @@ trait Tool extends Stats.Modifier {
 }
 
 object Tool {
-	def getModifier(stack: ItemStack) = Serialized.un[Tool](stack).getOrElse(Stats.Modifier.NOOP)
+	def getModifier(stack: ItemStack) = Serialized.un[Tool](stack).left.getOrElse(Stats.Modifier.NOOP)
 
 	object Item extends BaseItem {
 		name = "tool"
@@ -62,8 +62,8 @@ object Tool {
 			super.addLore(stack, player, lore, advanced)
 			if(advanced) {
 				lore += (Serialized.un[Tool](stack) match {
-					case Some(tool) => tool.toString
-					case None => "Not a Tool"
+					case Left(tool) => tool.toString
+					case Right(err) => err.toString
 				})
 			}
 		}

@@ -1,7 +1,7 @@
 package cpup.mc.tweak.content.tools
 
-import cpup.mc.lib.util.ItemUtil
-import cpup.mc.lib.util.serializing.{SerializableType, SerializationRegistry, Serialized}
+import cpup.mc.lib.util.{NBTUtil, ItemUtil}
+import cpup.mc.lib.util.serialization.{SerializationError, Serialization, SerializationRegistry, Serialized}
 import cpup.mc.tweak.CPupTweak
 import cpup.mc.tweak.content.BaseItem
 import net.minecraft.entity.player.EntityPlayer
@@ -31,28 +31,25 @@ object Part {
 			}) + id
 		}
 	}
-	object Shape extends SerializableType[Shape, NBTTagCompound] {
+	object Shape extends Serialization[Shape, NBTTagCompound] {
 		def mod = CPupTweak
 
 		override def id: String = s"${mod.ref.modID}:tools.part.shape"
-		override def nbtClass: Class[_ <: NBTTagCompound] = classOf[NBTTagCompound]
-		override def cla: Class[_ <: Shape] = classOf[Shape]
+		override def nbtClass = classOf[NBTTagCompound]
+		override def cla = classOf[Shape]
 
-		override def writeToNBT(data: Shape): NBTTagCompound = {
+		override def write(data: Shape): NBTTagCompound = {
 			val nbt = new NBTTagCompound
-			nbt.setString("id", data.id)
-			for(mod <- data.mod) nbt.setString("mod", mod)
+			nbt.setTag("id", Serialized(data.id))
+			for(mod <- data.mod) nbt.setTag("mod", Serialized(mod))
 			return nbt
 		}
 
-		override def readFromNBT(nbt: NBTTagCompound): Shape = Shape(
-			nbt.getString("id"),
-			if(nbt.hasKey("mod", NBT.TAG_STRING)) {
-				Some(nbt.getString("mod"))
-			} else {
-				None
-			}
-		)
+		override def read(nbt: NBTTagCompound) = Serialized.un[String](nbt.getCompoundTag("id")) match {
+			case Left(id) =>
+				Left(Shape(id, Serialized.un[String](nbt.getCompoundTag("mod")).left.toOption))
+			case Right(err) => Right(err)
+		}
 	}
 	SerializationRegistry.registerType(Shape)
 
@@ -69,50 +66,46 @@ object Part {
 			case None => ""
 		})
 	}
-	object Material extends SerializableType[Material, NBTTagCompound] {
+	object Material extends Serialization[Material, NBTTagCompound] {
 		def mod = CPupTweak
 
 		override def id: String = s"${mod.ref.modID}:tools.part.material"
 
-		override def nbtClass: Class[_ <: NBTTagCompound] = classOf[NBTTagCompound]
-		override def cla: Class[_ <: Material] = classOf[Material]
+		override def nbtClass = classOf[NBTTagCompound]
+		override def cla = classOf[Material]
 
-		override def writeToNBT(data: Material): NBTTagCompound = {
+		override def write(data: Material): NBTTagCompound = {
 			val nbt = new NBTTagCompound
-			nbt.setString("category", data.category)
-			for(mod <- data.mod) nbt.setString("mod", mod)
-			for(id <- data.id) nbt.setString("id", id)
+			nbt.setTag("category", Serialized(data.category))
+			for(mod <- data.mod) nbt.setTag("mod", Serialized(mod))
+			for(id <- data.id) nbt.setTag("id", Serialized(id))
 			return nbt
 		}
 
-		override def readFromNBT(nbt: NBTTagCompound): Material = Material(
-			nbt.getString("category"),
-			if(nbt.hasKey("id", NBT.TAG_STRING)) {
-				Some(nbt.getString("id"))
-			} else {
-				None
-			},
-			if(nbt.hasKey("mod", NBT.TAG_STRING)) {
-				Some(nbt.getString("mod"))
-			} else {
-				None
-			}
-		)
+		override def read(nbt: NBTTagCompound) = Serialized.un[String](nbt.getCompoundTag("category")) match {
+			case Left(category) =>
+				Left(Material(
+					category,
+					Serialized.un[String](nbt.getCompoundTag("id")).left.toOption,
+					Serialized.un[String](nbt.getCompoundTag("mod")).left.toOption
+				))
+			case Right(err) => Right(err)
+		}
 	}
 	SerializationRegistry.registerType(Material)
 
 	case class Modifier(id: String)
-	object Modifier extends SerializableType[Modifier, NBTTagString] {
+	object Modifier extends Serialization[Modifier, NBTTagString] {
 		def mod = CPupTweak
 
 		override def id: String = s"${mod.ref.modID}:tools.part.modification"
 
-		override def nbtClass: Class[_ <: NBTTagString] = classOf[NBTTagString]
-		override def cla: Class[_ <: Modifier] = classOf[Modifier]
+		override def nbtClass = classOf[NBTTagString]
+		override def cla = classOf[Modifier]
 
-		override def writeToNBT(data: Modifier): NBTTagString = new NBTTagString(data.id)
+		override def write(data: Modifier): NBTTagString = new NBTTagString(data.id)
 
-		override def readFromNBT(nbt: NBTTagString): Modifier = Modifier(nbt.func_150285_a_)
+		override def read(nbt: NBTTagString) = Left(Modifier(nbt.func_150285_a_))
 	}
 	SerializationRegistry.registerType(Modifier)
 
@@ -140,30 +133,33 @@ object Part {
 		_modifications.getOrElse((mod, None, None), Stats.Modifier.NOOP)
 	}
 
-	object Type extends SerializableType[Part, NBTTagCompound] {
+	object Type extends Serialization[Part, NBTTagCompound] {
 		def mod = CPupTweak
 		override def id = s"${mod.ref.modID}:tools.part"
 		override def cla = classOf[Part]
 
 		override def nbtClass = classOf[NBTTagCompound]
-		override def writeToNBT(part: Part) = {
+		override def write(part: Part) = {
 			val nbt = new NBTTagCompound
 			nbt.setTag("shape", Serialized(part.shape))
 			nbt.setTag("material", Serialized(part.material))
 			nbt.setTag("modifications", Serialized(part.modifications))
 			nbt
 		}
-		override def readFromNBT(nbt: NBTTagCompound) = (
+		override def read(nbt: NBTTagCompound) = (
 			Serialized.un[Part.Shape](nbt.getCompoundTag("shape")),
 			Serialized.un[Part.Material](nbt.getCompoundTag("material")),
 			Serialized.un[List[Part.Modifier]](nbt.getCompoundTag("modifications"))
 		) match {
-			case (Some(shape), Some(material), Some(modifications)) =>
-				Part(shape, material, modifications: _*)
+			case (Left(shape), Left(material), Left(modifications)) =>
+				Left(Part(shape, material, modifications: _*))
 
-			case r =>
-				mod.logger.info("got {}", r)
-				null
+			case (shape, material, modifications) =>
+				Right(
+					List[Either[_, SerializationError]](shape, material, modifications)
+						.filter(_.isRight).map(_.right.get)
+						.fold(SerializationError())(_ + _)
+				)
 		}
 
 	}
@@ -177,8 +173,8 @@ object Part {
 			if(advanced) {
 				lore += ItemUtil.compound(stack).toString
 				lore += (Serialized.un[Part](stack) match {
-					case Some(part) => part.toString
-					case None => "Not a Part"
+					case Left(part) => part.toString
+					case Right(e) => e.toString
 				})
 			}
 		}

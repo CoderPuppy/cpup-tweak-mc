@@ -1,8 +1,9 @@
 package cpup.mc.tweak.content.tools
 
 import cpup.mc.lib.content.ContentRegistrar
-import cpup.mc.tweak.CPupTweak
 import scala.reflect.runtime.universe.TypeTag
+
+import cpup.mc.tweak.CPupTweak
 
 object Tools {
 	def register(registrar: ContentRegistrar[CPupTweak.type]) {

@@ -1,7 +1,17 @@
 package cpup.mc.tweak.content.assistant
 
-import net.minecraft.entity.player.EntityPlayer
+import scala.collection.mutable
 
-class Data(final val player: EntityPlayer) {
+import net.minecraft.nbt.NBTTagCompound
 
+class Data {
+  val wings = new mutable.HashMap[Class[Wing], Wing]()
+
+  def readFromNBT(nbt: NBTTagCompound) {
+
+  }
+
+  def writeToNBT(nbt: NBTTagCompound) {
+
+  }
 }
