@@ -17,7 +17,7 @@ class Assistant(config: Config, logger: Logger) extends ModLifecycleHandler {
 		val entityID = EntityRegistry.findGlobalUniqueEntityId
 		val entityName = s"${ModuleLoader.modulesByInst(this).id}:assistant"
 		EntityRegistry.registerModEntity(classOf[Entity], entityName, entityID, CPupTweak, 64, 1, true)
-		if(Side.effective == Side.CLIENT) {
+		if(Side.effective.isClient) {
 			RenderingRegistry.registerEntityRenderingHandler(classOf[Entity], Render)
 		}
 		GameRegistry.registerItem(Item, Item.name)

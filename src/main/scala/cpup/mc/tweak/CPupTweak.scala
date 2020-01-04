@@ -10,5 +10,5 @@ object CPupTweak extends CPupMod[Ref.type] {
 	override def ref = Ref
 	override final val content = Content
 
-	loadModule[Assistant](classOf[Assistant])
+	loadModule[Assistant]
 }

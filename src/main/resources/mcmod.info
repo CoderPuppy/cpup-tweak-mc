@@ -1,7 +1,7 @@
 [
 	{
 		"modid": "cpup-tweak",
-		"name": "CoderPuppy's Tweak Mod",
+		"name": "CPupTweak",
 		"version": "$version",
 		"mcversion": "$mcVersion",
 		"authors": ["CoderPuppy"]

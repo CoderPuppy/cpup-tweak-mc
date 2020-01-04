@@ -4,7 +4,6 @@ import cpup.mc.lib.content.CPupContent
 import cpup.mc.tweak.CPupTweak
 import cpup.mc.tweak.content.tools.Tools
 import cpw.mods.fml.common.event.FMLPreInitializationEvent
-import Tools
 
 object Content extends CPupContent[CPupTweak.type] {
 	override def mod = CPupTweak
